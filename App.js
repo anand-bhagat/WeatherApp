@@ -14,7 +14,9 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import WeatherReport from './components/WeatherReport';
 import AddFarm from './AddFarm';
-import { NativeBaseProvider } from 'native-base';
+import Home from './Home';
+import { NativeBaseProvider, Hidden } from 'native-base';
+import { createStackNavigator } from '@react-navigation/stack';
 
 function HomeScreen({ navigation }) {
   return (
@@ -36,18 +38,28 @@ function NotificationsScreen({ navigation }) {
 }
 
 const Drawer = createDrawerNavigator();
+const Stack = createStackNavigator();
 
 const App = () => {
     return (
       <NativeBaseProvider>
         <NavigationContainer>
-          <Drawer.Navigator initialRouteName="Add Farm">
-            <Drawer.Screen name="Home" component={WeatherReport} />
-            <Drawer.Screen name="Add Farm" component={AddFarm} />
-          </Drawer.Navigator>
+          <Stack.Navigator>
+            <Stack.Screen name={`Root`} component={Root} options={{ headerShown : false }}/>
+            <Stack.Screen name={`Weather Report`} component={WeatherReport} options={({ route }) => ({ title: route.params.farmName })}/>
+          </Stack.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>
     );
+};
+
+const Root = () => {
+  return(
+    <Drawer.Navigator initialRouteName="Home">
+        <Drawer.Screen name="Home" component={Home} />
+        <Drawer.Screen name="Add Farm" component={AddFarm} />
+    </Drawer.Navigator>
+  );
 };
 
 
