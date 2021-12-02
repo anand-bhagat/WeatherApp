@@ -15,7 +15,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import WeatherReport from './components/WeatherReport';
 import AddFarm from './AddFarm';
 import Home from './Home';
-import { NativeBaseProvider, Hidden } from 'native-base';
+import { NativeBaseProvider, Hidden, ScrollView } from 'native-base';
 import { createStackNavigator } from '@react-navigation/stack';
 
 function HomeScreen({ navigation }) {
@@ -44,10 +44,10 @@ const App = () => {
     return (
       <NativeBaseProvider>
         <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen name={`Root`} component={Root} options={{ headerShown : false }}/>
-            <Stack.Screen name={`Weather Report`} component={WeatherReport} options={({ route }) => ({ title: route.params.farmName })}/>
-          </Stack.Navigator>
+            <Stack.Navigator>
+              <Stack.Screen name={`Root`} component={Root} options={{ headerShown : false }}/>
+              <Stack.Screen name={`Weather Report`} component={WeatherReport} options={({ route }) => ({ title: route.params.farmName })}/>
+            </Stack.Navigator>
         </NavigationContainer>
       </NativeBaseProvider>
     );

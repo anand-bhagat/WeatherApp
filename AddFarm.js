@@ -7,6 +7,7 @@ import geolocation from '@react-native-community/geolocation';
 import RNAndroidLocationEnabler from 'react-native-android-location-enabler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 const AddFarm = ({navigation}) => {
@@ -102,63 +103,65 @@ const AddFarm = ({navigation}) => {
 	};
     
     return (
-        <Stack space={0} height="100%">
-			<Box p={3}>
-				<FormControl isRequired isInvalid={invalid.farmName.flag}>
-					<FormControl.Label>Enter a Farm Name</FormControl.Label>
-					<Input
-						w="100%"
-						placeholder="Farm Name"
-						_light={{
-							placeholderTextColor: "blueGray.900",
-						}}
-						_dark={{
-							placeholderTextColor: "blueGray.400",
-						}}
-						backgroundColor="white"
-						isRequired={true}
-						onChangeText={(value) => setData({ ...formData, farmName: value })}
-					/>
-					<FormControl.ErrorMessage>
-						{invalid.farmName.message}
-					</FormControl.ErrorMessage>
-				</FormControl>
-			</Box>
-          	<Box bg="primary.400" shadow={3} width="100%" height={400}>
-				<MapView
-				provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-				style={styles.map}
-				initialRegion={position}
-				showsUserLocation={true}
-				loadingEnabled={true}
-				onPress={handleMapClick}
-				toolbarEnabled={false}
-				>
-					<Marker
-						key="new_farm"
-						coordinate={{ latitude: formData.latitude, longitude: formData.longitude}}
-						title="New Farm"
-						description="farm"
-					/>
-				</MapView>
-          	</Box>
-			<Stack direction="column">
-				<Stack pl={3} pr={6} pt={3} direction="row" space={3}>
-					<Box bg="primary.400" rounded="md" shadow={3} width="50%" py={4} px={2}>
-						<Text  mb={0} color="white"> Latitude : {formData.latitude.toFixed(8)}</Text>
-					</Box>
-					<Box bg="primary.400" rounded="md" shadow={3} width="50%" py={4} px={2}>
-						<Text  mb={0} color="white"> Longitude : {formData.longitude.toFixed(8)}</Text>
-					</Box>
+		<ScrollView>
+			<Stack space={0}>
+				<Box p={3}>
+					<FormControl isRequired isInvalid={invalid.farmName.flag}>
+						<FormControl.Label>Enter a Farm Name</FormControl.Label>
+						<Input
+							w="100%"
+							placeholder="Farm Name"
+							_light={{
+								placeholderTextColor: "blueGray.900",
+							}}
+							_dark={{
+								placeholderTextColor: "blueGray.400",
+							}}
+							backgroundColor="white"
+							isRequired={true}
+							onChangeText={(value) => setData({ ...formData, farmName: value })}
+						/>
+						<FormControl.ErrorMessage>
+							{invalid.farmName.message}
+						</FormControl.ErrorMessage>
+					</FormControl>
+				</Box>
+				<Box bg="primary.400" shadow={3} width="100%" height={400}>
+					<MapView
+					provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+					style={styles.map}
+					initialRegion={position}
+					showsUserLocation={true}
+					loadingEnabled={true}
+					onPress={handleMapClick}
+					toolbarEnabled={false}
+					>
+						<Marker
+							key="new_farm"
+							coordinate={{ latitude: formData.latitude, longitude: formData.longitude}}
+							title="New Farm"
+							description="farm"
+						/>
+					</MapView>
+				</Box>
+				<Stack direction="column">
+					<Stack pl={3} pr={6} pt={3} direction="row" space={3}>
+						<Box bg="primary.400" rounded="md" shadow={3} width="50%" py={4} px={2}>
+							<Text  mb={0} color="white"> Latitude : {formData.latitude.toFixed(8)}</Text>
+						</Box>
+						<Box bg="primary.400" rounded="md" shadow={3} width="50%" py={4} px={2}>
+							<Text  mb={0} color="white"> Longitude : {formData.longitude.toFixed(8)}</Text>
+						</Box>
+					</Stack>
 				</Stack>
+				<Box px={3} >
+					<Button onPress={onSubmit} mt="5" colorScheme="cyan" shadow={3} isLoading={isFarmSaving}>
+						Submit
+					</Button>
+				</Box>
+				<SuccessAlertDialog isOpen={successAlert} setSuccessAlert={setSuccessAlert} />
 			</Stack>
-			<Box px={3} >
-				<Button onPress={onSubmit} mt="5" colorScheme="cyan" shadow={3} isLoading={isFarmSaving}>
-					Submit
-				</Button>
-			</Box>
-			<SuccessAlertDialog isOpen={successAlert} setSuccessAlert={setSuccessAlert} />
-        </Stack>
+		</ScrollView>
     );
 };
 

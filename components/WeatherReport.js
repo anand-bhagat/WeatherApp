@@ -8,8 +8,9 @@
 
 import {Box, Center, Heading, HStack, NativeBaseProvider, Spinner} from 'native-base';
 import React, {useEffect, useState} from 'react';
-import { ImageBackground, StyleSheet, View } from 'react-native';
-import DateTime from './DateTime';
+import { ImageBackground, StyleSheet, Text, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import CurrentWeatherDetails from './CurrentWeatherDetails';
 import WeatherScroll from './WeatherScroll';
 
 const img = require('../assets/images/background.jpg');
@@ -24,15 +25,15 @@ const WeatherReport = ({route, navigation}) => {
     
     useEffect(() => {
         fetchDataFromApi(latitude, longitude);
-    },[]);
+    },[navigation]);
 
 
-    const fetchDataFromApi = async (latitude, longitude) => {
+    const fetchDataFromApi = (latitude, longitude) => {
         setLoading(true);
-        await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=hourly,minutely&units=metric&appid=${API_KEY}`).then(res => res.json()).then(data => {
+        fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts,minutely&units=metric&appid=${API_KEY}`).then(res => res.json()).then(data => {
             setData(data);
+            setLoading(false);
         });
-        setLoading(false);
     }
 
     return (
@@ -48,14 +49,14 @@ const WeatherReport = ({route, navigation}) => {
             </Center>
           }
           {!loading && 
-            <View style={styles.container}>
-                <ImageBackground source={img} style={styles.image}>
-                    <View style={styles.content}>
-                        <DateTime current={data.current} lat={data.lat} long={data.lon} timezone={data.timezone}/>
-                        <WeatherScroll weatherData={data.daily}/>
-                    </View>
-                </ImageBackground>
-            </View>
+            <ScrollView>
+              <View style={styles.container}>
+                <View style={styles.content}>
+                    <CurrentWeatherDetails current={data?.current} hourly={data?.hourly} lat={data.lat} long={data.lon} timezone={data.timezone}/>
+                    <WeatherScroll weatherData={data.daily} timezone={data.timezone}/>
+                </View>
+              </View>
+            </ScrollView>
           }
       </>
     );
@@ -64,6 +65,7 @@ const WeatherReport = ({route, navigation}) => {
 const styles = StyleSheet.create({
   container:{
     flex: 1,
+    backgroundColor: "rgb(124, 187, 232)",
   },
   image:{
     flex:1,
@@ -72,7 +74,6 @@ const styles = StyleSheet.create({
   },
   content: {
     height:"100%",
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
   },
   text: {
     color:"white",

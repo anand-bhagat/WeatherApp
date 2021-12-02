@@ -1,32 +1,53 @@
 import { whileStatement } from '@babel/types';
 import moment from 'moment-timezone';
+import { Center, HStack } from 'native-base';
 import React from 'react';
 import { ScrollView, Text, View, Image, StyleSheet } from 'react-native';
 
-const WeatherScroll = ({weatherData}) => {
+const WeatherScroll = ({weatherData, timezone}) => {
     return (
         <View style={styles.scrollViewContainer}>
             <ScrollView horizontal={true} style={styles.scrollView}>
-                <CurrentTempEl data={weatherData ? weatherData[0] : {}}/>
-                <FutureForecast data={weatherData ? weatherData : {}}/>
+                {
+                    weatherData && weatherData.length > 0 ? 
+
+                    weatherData.map((data,idx) => {
+                        return(
+                            <DailyForecastItem data={data ? data : {}} timezone={timezone ? timezone : ""} key={idx} />
+                        );
+                    })
+                    :
+                    <View />
+                }
             </ScrollView>
         </View>
     )
 }
 
-const CurrentTempEl = ({data}) => {
+const DailyForecastItem = ({data, timezone}) => {
     if(data && data.weather){
         const img = {uri: `https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`};
 
         return(
-            <View style={styles.currentTempContainer}>
-                <Image source={img} style={styles.currentTempImg}/>
-                <View style={styles.currentTempTextContainer}>
+            <HStack style={styles.currentTempContainer} marginRight={3} >
+                <Center width="50%">
+                    <Image source={img} style={styles.currentTempImg}/>
                     <Text style={styles.day}>{moment(data.dt * 1000).format('dddd')}</Text>
-                    <Text style={styles.temp}>Night - {data.temp.night}&#176;C</Text>
-                    <Text style={styles.temp}>Day - {data.temp.day}&#176;C</Text>
-                </View>
-            </View>
+                </Center>
+                <Center width="50%">
+                    <WeatherItem title="Humidity" value={data ? data.humidity : ''} unit="%"/>
+                    <WeatherItem title="Pressure" value={data ? data.pressure : ''} unit="hPA"/>
+                    <WeatherItem title="Wind Speed" value={data ? data.wind_speed : ''} unit="km/h"/>
+                    <WeatherItem title="Sunrise" value={data ? moment.tz(data.sunrise * 1000, timezone).format('hh:mm a') : ''} unit=""/>
+                    <WeatherItem title="Sunset" value={data ? moment.tz(data.sunset * 1000, timezone).format('hh:mm a') : ''} unit=""/>
+
+                    <WeatherItem title="Clouds" value={data ? data.clouds : ''} unit="%"/>
+                    <WeatherItem title="UV index" value={data ? data.uvi : ''} unit=""/>
+                    <WeatherItem title="Temp Min" value={data ? data.temp.min : ''} unit="Celsius"/>
+                    <WeatherItem title="Temp Max" value={data ? data.temp.max : ''} unit="Celsius"/>
+                    <WeatherItem title="Rain Probability" value={data ? data.pop * 100 : ''} unit="%"/>
+                </Center>
+            </HStack>
         );
     }else{
         return(
@@ -37,40 +58,18 @@ const CurrentTempEl = ({data}) => {
     
 }
 
-const FutureForecast = ({data}) => {
-    return (
-        <View style={styles.forecastContainer}>
-            {
-                data && data.length > 0 ? 
-
-                data.map((item,idx) => {
-                    return(
-                        idx !== 0 && <FutureForecastItem key={idx} item={item}/>
-                    );
-                })
-                :
-                <View />
-            }
-        </View>
-    );
-}
-
-const FutureForecastItem = ({item}) => {
-    const img = {uri: `https://openweathermap.org/img/wn/${item.weather[0].icon}@4x.png`};
-    return (
-        <View style={styles.futureForecastItemContainer}>
-            <Text style={styles.day}>{moment(item.dt * 1000).format('ddd')}</Text>
-            <Image source={img} style={styles.futureForecastImg}/>
-            <Text style={styles.temp}>Night - {item.temp.night}&#176;C</Text>
-            <Text style={styles.temp}>Day - {item.temp.day}&#176;C</Text>
+const WeatherItem = ({title, value, unit}) => {
+    return(
+        <View style={styles.weatherItem}>
+            <Text style={styles.weatherItemText}>{title} : </Text>
+            <Text style={styles.weatherItemText}>{value} {unit}</Text>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     scrollViewContainer: {
-        flex: 1,
-        backgroundColor: '#18181bcc',
+        flex: 0.8,
         padding: 30,
     },
     scrollView: {
@@ -81,14 +80,12 @@ const styles = StyleSheet.create({
         height: 150,
     },
     currentTempContainer: {
-        flexDirection: 'row',
-        backgroundColor: '#00000033',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: '#00000055',
         borderRadius: 10,
         borderColor: '#eee',
         borderWidth: 1,
         padding: 15,
+        width: 300
     },
     day:{
         fontSize: 20,
@@ -125,7 +122,16 @@ const styles = StyleSheet.create({
     },
     forecastContainer: {
         flexDirection: 'row',
-    }
+    },
+    weatherItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    weatherItemText: {
+        color: "white",
+        fontSize: 14,
+        fontWeight: '300'
+    },
 });
 
 export default WeatherScroll;
